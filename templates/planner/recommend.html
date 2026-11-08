@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}Where should I go?{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="eyebrow">Personal suggestions</div>
+  <h1 class="section-title">Where should I go?</h1>
+  <p class="text-muted">Tell us when you are travelling, your budget and what you enjoy. Each place gets a score out of 100, with the reasons shown.</p>
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <form method="get" class="card-soft">
+        {% include 'partials/field.html' with field=form.month %}
+        {% include 'partials/field.html' with field=form.daily_budget %}
+        {% include 'partials/field.html' with field=form.max_km %}
+        <fieldset class="mb-3">
+          <legend class="form-label fs-6">Interests</legend>
+          {% for checkbox in form.categories %}
+          <div class="form-check">{{ checkbox.tag }} <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label></div>
+          {% endfor %}
+        </fieldset>
+        <div class="d-grid"><button class="btn btn-primary"><i class="bi bi-lightbulb"></i> Suggest places</button></div>
+      </form>
+    </div>
+    <div class="col-lg-8">
+      {% if results is None %}
+      <div class="card-soft empty-state"><i class="bi bi-compass"></i><p class="mt-2 mb-0">Fill in the form to get suggestions.</p></div>
+      {% else %}
+        {% for r in results %}
+        {% with d=r.place %}
+        <div class="card-soft mb-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <span class="chip mb-2"><i class="bi bi-{{ d.category.icon }}"></i> {{ d.category.name }}</span>
+              <h2 class="h5 fw-bold mb-1"><a href="{{ d.get_absolute_url }}">{{ forloop.counter }}. {{ d.name }}</a></h2>
+              <div class="dest-meta"><i class="bi bi-geo-alt"></i> {{ d.district }}, {{ d.division.name }} · ≈ {{ d.km_from_dhaka }} km from Dhaka · {{ d.price_per_day|taka }}/day</div>
+            </div>
+            <div class="text-end"><div class="fs-3 fw-bold text-success">{{ r.score|floatformat:0 }}</div><small class="text-muted">/ 100</small></div>
+          </div>
+          <div class="score-bar my-3"><span style="width:{{ r.score|floatformat:0 }}%"></span></div>
+          <ul class="small mb-0">{% for reason in r.reasons %}<li>{{ reason }}</li>{% empty %}<li class="text-muted">Partial match</li>{% endfor %}</ul>
+        </div>
+        {% endwith %}
+        {% empty %}
+        <div class="card-soft empty-state"><i class="bi bi-emoji-frown"></i><p class="mt-2 mb-0">No places match. Try a larger distance or budget.</p></div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
