@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}{{ package.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb"><ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="{% url 'package_list' %}">Tour packages</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ package.title }}</li>
+  </ol></nav>
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card-soft mb-4">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="chip"><i class="bi bi-calendar-event"></i> {{ package.start_date|date:"d M Y" }} – {{ package.end_date|date:"d M Y" }}</span>
+          <span class="chip"><i class="bi bi-clock"></i> {{ package.days }} days</span>
+          <span class="chip chip-accent"><i class="bi bi-bus-front"></i> {{ package.get_transport_display }} from {{ package.start_city }}</span>
+        </div>
+        <h1 class="section-title h2">{{ package.title }}</h1>
+        <p class="lead text-muted">{{ package.summary }}</p>
+        <p>{{ package.description|linebreaksbr }}</p>
+        <div class="row g-4 mt-1">
+          <div class="col-md-6"><h2 class="h6 fw-bold">Included</h2>
+            <ul class="list-unstyled mb-0">{% for x in package.include_list %}<li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>{{ x }}</li>{% endfor %}</ul></div>
+          {% if package.exclude_list %}<div class="col-md-6"><h2 class="h6 fw-bold">Not included</h2>
+            <ul class="list-unstyled mb-0">{% for x in package.exclude_list %}<li class="mb-1"><i class="bi bi-x-circle text-danger me-2"></i>{{ x }}</li>{% endfor %}</ul></div>{% endif %}
+        </div>
+      </div>
+      <h2 class="h5 fw-bold mb-3">Places you will visit</h2>
+      <div class="row g-4">{% for p in package.destinations.all %}<div class="col-md-6">{% include 'partials/place_card.html' %}</div>{% endfor %}</div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card-soft position-sticky" style="top:90px">
+        <div class="d-flex justify-content-between align-items-baseline"><span class="fs-3 fw-bold">{{ package.price_per_person|taka }}</span><span class="text-muted">per person</span></div>
+        <p class="small {% if package.seats_left < 5 %}text-danger fw-bold{% else %}text-muted{% endif %}">{{ package.seats_left }} of {{ package.total_seats }} seats left</p>
+        {% if package.can_book %}
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'add_to_cart' package.slug %}">{% csrf_token %}
+            {% include 'partials/field.html' with field=form.travelers %}
+            <div class="d-grid"><button class="btn btn-primary btn-lg"><i class="bi bi-cart-plus"></i> Add to cart</button></div>
+          </form>
+          <p class="small text-muted mt-2 mb-0">Pay after we confirm. Free cancellation before the tour starts.</p>
+          {% else %}
+          <div class="d-grid"><a class="btn btn-primary btn-lg" href="{% url 'login' %}?next={{ request.path }}">Log in to book</a></div>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-warning rounded-4 mb-0">This tour cannot be booked{% if package.seats_left == 0 %}: it is full{% endif %}.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

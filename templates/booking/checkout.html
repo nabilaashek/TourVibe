@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:960px">
+  <div class="eyebrow">Booking</div>
+  <h1 class="section-title mb-4">Checkout</h1>
+  <div class="row g-4">
+    <div class="col-md-7">
+      <form method="post" class="card-soft" novalidate>{% csrf_token %}
+        <h2 class="h6 fw-bold mb-3">Contact details</h2>
+        {% include 'partials/form_errors.html' %}
+        {% include 'partials/field.html' with field=form.contact_name %}
+        {% include 'partials/field.html' with field=form.contact_phone %}
+        {% include 'partials/field.html' with field=form.note %}
+        <div class="d-grid"><button class="btn btn-primary btn-lg">Place order</button></div>
+      </form>
+    </div>
+    <div class="col-md-5">
+      <div class="card-soft">
+        <h2 class="h6 fw-bold mb-3">Order summary</h2>
+        {% for item in items %}<div class="cost-row"><span>{{ item.package.title }} <small class="text-muted">× {{ item.travelers }}</small></span><strong>{{ item.subtotal|taka }}</strong></div>{% endfor %}
+        <div class="d-flex justify-content-between pt-3"><span class="fw-bold">Total</span><span class="cost-total fs-4">{{ total|taka }}</span></div>
+        <a href="{% url 'cart' %}" class="small">Edit cart</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

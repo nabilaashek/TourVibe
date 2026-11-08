@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Tour packages{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-md-flex justify-content-between align-items-end mb-4 gap-3">
+    <div><div class="eyebrow">Ready-made trips</div><h1 class="section-title mb-0">Tour packages</h1></div>
+    <form method="get" class="d-flex gap-2 mt-3 mt-md-0">
+      <input class="form-control" name="q" value="{{ q }}" placeholder="Search tours or places" aria-label="Search tours">
+      <button class="btn btn-primary" aria-label="Search"><i class="bi bi-search"></i></button>
+    </form>
+  </div>
+  <div class="row g-4">
+    {% for pk in page_obj %}<div class="col-md-6 col-lg-4">{% include 'partials/package_card.html' %}</div>
+    {% empty %}<div class="col-12"><div class="empty-state card-soft"><i class="bi bi-calendar-x"></i><p class="mt-2 mb-0">No upcoming tours found.</p></div></div>{% endfor %}
+  </div>
+  {% include 'partials/pagination.html' %}
+</div>
+{% endblock %}

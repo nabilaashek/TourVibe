@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="eyebrow">Trips</div>
+  <h1 class="section-title mb-4">My orders</h1>
+  <div class="card-soft p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr><th>Order</th><th>Tours</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for o in orders %}
+          <tr>
+            <td class="fw-semibold">{{ o.reference }}</td>
+            <td class="small">{% for i in o.items.all %}{{ i.package.title }} × {{ i.travelers }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+            <td>{{ o.created_at|date:"d M Y" }}</td>
+            <td>{{ o.total_price|taka }}</td>
+            <td><span class="status status-{{ o.status }}">{{ o.get_status_display }}</span></td>
+            <td class="text-end"><a href="{{ o.get_absolute_url }}" class="btn btn-sm btn-light">Details</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6"><div class="empty-state"><i class="bi bi-receipt"></i><p class="mt-2">No orders yet.</p><a href="{% url 'package_list' %}" class="btn btn-primary">Browse tours</a></div></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
