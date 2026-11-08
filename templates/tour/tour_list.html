@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Destinations{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-md-flex justify-content-between align-items-end mb-4">
+    <div>
+      <div class="eyebrow">Explore</div>
+      <h1 class="section-title">Destinations in Bangladesh</h1>
+      <p class="text-muted mb-0">{{ page_obj.paginator.count }} place{{ page_obj.paginator.count|pluralize }} found</p>
+    </div>
+    {% if user_is_admin %}<a href="{% url 'create_tour' %}" class="btn btn-primary mt-3 mt-md-0"><i class="bi bi-plus-lg"></i> Add destination</a>{% endif %}
+  </div>
+  <div class="row g-4">
+    <aside class="col-lg-3">
+      <form method="get" class="card-soft filter-bar">
+        <h2 class="h6 fw-bold mb-3"><i class="bi bi-funnel"></i> Filter</h2>
+        {% include 'partials/field.html' with field=form.q %}
+        {% include 'partials/field.html' with field=form.division %}
+        {% include 'partials/field.html' with field=form.category %}
+        {% include 'partials/field.html' with field=form.month %}
+        {% include 'partials/field.html' with field=form.max_price %}
+        {% include 'partials/field.html' with field=form.sort %}
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary">Apply</button>
+          <a href="{% url 'tour_list' %}" class="btn btn-light">Reset</a>
+        </div>
+      </form>
+    </aside>
+    <section class="col-lg-9">
+      <div class="row g-4">
+        {% for p in page_obj %}
+        <div class="col-sm-6 col-xl-4">{% include 'partials/place_card.html' %}</div>
+        {% empty %}
+        <div class="col-12"><div class="empty-state card-soft"><i class="bi bi-binoculars"></i><p class="mt-2 mb-0">Nothing matches these filters.</p></div></div>
+        {% endfor %}
+      </div>
+      {% include 'partials/pagination.html' %}
+    </section>
+  </div>
+</div>
+{% endblock %}

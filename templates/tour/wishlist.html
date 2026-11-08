@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}My wishlist{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="eyebrow">Saved</div>
+  <h1 class="section-title mb-4">My wishlist</h1>
+  <div class="row g-4">
+    {% for item in items %}
+      {% with p=item.tour %}<div class="col-sm-6 col-lg-4">{% include 'partials/place_card.html' %}</div>{% endwith %}
+    {% empty %}
+    <div class="col-12"><div class="empty-state card-soft"><i class="bi bi-heart"></i><p class="mt-2">You have not saved any places yet.</p><a href="{% url 'tour_list' %}" class="btn btn-primary">Explore places</a></div></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:900px">
+  <div class="eyebrow">Admin</div>
+  <h1 class="section-title mb-4">{{ title }}</h1>
+  <form method="post" enctype="multipart/form-data" class="card-soft" novalidate>{% csrf_token %}
+    {% include 'partials/form_errors.html' %}
+    <div class="row">
+      <div class="col-md-6">{% include 'partials/field.html' with field=form.name %}</div>
+      <div class="col-md-6">{% include 'partials/field.html' with field=form.short_description %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.division %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.district %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.category %}</div>
+      <div class="col-12">{% include 'partials/field.html' with field=form.description %}</div>
+      <div class="col-md-6">{% include 'partials/field.html' with field=form.highlights %}</div>
+      <div class="col-md-6">{% include 'partials/field.html' with field=form.tips %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.best_months %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.price_per_day %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.entry_fee %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.latitude %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.longitude %}</div>
+      <div class="col-md-4">{% include 'partials/field.html' with field=form.cover_image %}</div>
+      <div class="col-md-6"><div class="form-check mb-3">{{ form.is_featured }} <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">Show on home page</label></div></div>
+      <div class="col-md-6"><div class="form-check mb-3">{{ form.is_active }} <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Visible to travelers</label></div></div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary">Save</button>
+      <a href="{% if tour %}{{ tour.get_absolute_url }}{% else %}{% url 'tour_list' %}{% endif %}" class="btn btn-light">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}{{ tour.name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb"><ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="{% url 'tour_list' %}">Destinations</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'tour_list' %}?division={{ tour.division.slug }}">{{ tour.division.name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ tour.name }}</li>
+  </ol></nav>
+
+  <div class="dest-cover lg cover-{{ tour.category.slug }} {% if tour.cover_image %}has-photo{% endif %} mb-4" {% if tour.cover_image %}style="background-image:url('{{ tour.cover_image.url }}')"{% endif %}>
+    {% if not tour.cover_image %}<i class="bi bi-{{ tour.category.icon }} cover-icon" style="font-size:7rem"></i>{% endif %}
+    <div>
+      <span class="chip chip-light mb-2"><i class="bi bi-{{ tour.category.icon }}"></i> {{ tour.category.name }}</span>
+      {% if not tour.is_active %}<span class="chip chip-accent mb-2">Hidden</span>{% endif %}
+      <h1 class="display-6 fw-bold mb-1">{{ tour.name }}</h1>
+      <p class="mb-0 opacity-75"><i class="bi bi-geo-alt"></i> {{ tour.district }}, {{ tour.division.name }} Division</p>
+    </div>
+  </div>
+
+  {% if user_is_admin %}
+  <div class="d-flex gap-2 mb-4">
+    <a href="{% url 'update_tour' tour.slug %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+    <a href="{% url 'delete_tour' tour.slug %}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete</a>
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card-soft mb-4">
+        <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-3">
+          <p class="lead fw-semibold mb-0">{{ tour.short_description }}</p>
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'toggle_wishlist' tour.slug %}" class="js-wishlist">{% csrf_token %}
+            <button class="btn btn-outline-danger"><i class="bi {% if tour.pk in wishlist_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i> <span class="wish-label">{% if tour.pk in wishlist_ids %}Saved{% else %}Save{% endif %}</span></button>
+          </form>
+          {% endif %}
+        </div>
+        <p>{{ tour.description|linebreaksbr }}</p>
+        {% if tour.highlight_list %}
+        <h2 class="h6 fw-bold mt-4">Highlights</h2>
+        <ul class="list-unstyled">{% for h in tour.highlight_list %}<li class="mb-1"><i class="bi bi-check2-circle text-success me-2"></i>{{ h }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% if tour.tip_list %}
+        <h2 class="h6 fw-bold mt-4">Travel tips</h2>
+        <ul class="list-unstyled mb-0">{% for t in tour.tip_list %}<li class="mb-1"><i class="bi bi-info-circle text-warning me-2"></i>{{ t }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      <div class="card-soft mb-4" id="gallery">
+        <h2 class="h5 fw-bold mb-3">Photo gallery</h2>
+        <div class="row g-3">
+          {% for photo in tour.images.all %}
+          <div class="col-6 col-md-4"><img src="{{ photo.image.url }}" alt="{{ photo.caption|default:tour.name }}" class="gallery-img">{% if photo.caption %}<div class="small text-muted mt-1">{{ photo.caption }}</div>{% endif %}</div>
+          {% empty %}<p class="text-muted small mb-0">No extra photos yet.</p>{% endfor %}
+        </div>
+        {% if user_is_admin %}
+        <form method="post" enctype="multipart/form-data" action="{% url 'add_photo' tour.slug %}" class="row g-2 align-items-end mt-3">{% csrf_token %}
+          <div class="col-md-5">{{ photo_form.image }}</div>
+          <div class="col-md-5">{{ photo_form.caption }}</div>
+          <div class="col-md-2 d-grid"><button class="btn btn-outline-primary">Upload</button></div>
+        </form>
+        {% endif %}
+      </div>
+
+      <div class="card-soft mb-4" id="reviews">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 fw-bold mb-0">Reviews</h2>
+          <div>{% stars rating.avg 'lg' %} <span class="fw-bold">{{ rating.avg }}</span> <small class="text-muted">({{ rating.total }})</small></div>
+        </div>
+        {% for r in reviews %}
+        <div class="border-bottom py-3">
+          <div class="d-flex justify-content-between">
+            <div><strong>{{ r.title }}</strong> <span class="ms-1">{% stars r.rating %}</span></div>
+            {% if r.user == user or user_is_admin %}
+            <form method="post" action="{% url 'delete_review' r.pk %}" onsubmit="return confirm('Delete this review?')">{% csrf_token %}<button class="btn btn-sm btn-link text-danger p-0">Delete</button></form>
+            {% endif %}
+          </div>
+          <p class="mb-1 small">{{ r.comment }}</p>
+          <small class="text-muted">{{ r.user.profile.display_name }}{% if r.visited_on %} · visited {{ r.visited_on|date:"M Y" }}{% endif %}</small>
+        </div>
+        {% empty %}<p class="text-muted">No reviews yet. Be the first!</p>{% endfor %}
+
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'save_review' tour.slug %}" class="mt-4">{% csrf_token %}
+          <h3 class="h6 fw-bold">{% if my_review %}Update your review{% else %}Write a review{% endif %}</h3>
+          <div class="row">
+            <div class="col-md-4">{% include 'partials/field.html' with field=review_form.rating %}</div>
+            <div class="col-md-8">{% include 'partials/field.html' with field=review_form.title %}</div>
+          </div>
+          {% include 'partials/field.html' with field=review_form.comment %}
+          <div class="row align-items-end">
+            <div class="col-md-6">{% include 'partials/field.html' with field=review_form.visited_on %}</div>
+            <div class="col-md-6 mb-3 text-md-end"><button class="btn btn-primary">{% if my_review %}Update{% else %}Post review{% endif %}</button></div>
+          </div>
+        </form>
+        {% else %}
+        <p class="mt-3 mb-0"><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to write a review.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card-soft mb-4">
+        <h2 class="h6 fw-bold mb-3">Plan your visit</h2>
+        <div class="cost-row"><span class="text-muted">Best time</span><strong>{{ tour.month_names }}</strong></div>
+        <div class="cost-row"><span class="text-muted">This month</span>{% if this_month in tour.month_list %}<span class="chip">Great time to go</span>{% else %}<span class="chip chip-accent">Off season</span>{% endif %}</div>
+        <div class="cost-row"><span class="text-muted">Daily cost</span><strong>{{ tour.price_per_day|taka }}/person</strong></div>
+        <div class="cost-row"><span class="text-muted">Entry fee</span><strong>{% if tour.entry_fee %}{{ tour.entry_fee|taka }}{% else %}Free / varies{% endif %}</strong></div>
+        <div class="cost-row border-0"><span class="text-muted">From Dhaka</span><strong>≈ {{ tour.km_from_dhaka }} km</strong></div>
+        <div class="d-grid gap-2 mt-3">
+          <a href="{% url 'planner' %}?place={{ tour.slug }}" class="btn btn-primary"><i class="bi bi-calculator"></i> Estimate trip cost</a>
+          <a href="{{ tour.map_link }}" target="_blank" rel="noopener" class="btn btn-light"><i class="bi bi-map"></i> Open in Google Maps</a>
+        </div>
+      </div>
+      {% if packages %}
+      <div class="card-soft mb-4">
+        <h2 class="h6 fw-bold mb-3">Tours that go here</h2>
+        {% for pk in packages %}
+        <a href="{{ pk.get_absolute_url }}" class="tile mb-2"><span class="tile-icon"><i class="bi bi-ticket-perforated"></i></span>
+          <span><span class="fw-bold d-block">{{ pk.title }}</span><small class="text-muted">{{ pk.start_date|date:"d M" }} · {{ pk.price_per_person|taka }}</small></span></a>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="card-soft">
+        <h2 class="h6 fw-bold mb-3">Nearby places</h2>
+        {% for n in nearby %}
+        <a href="{{ n.get_absolute_url }}" class="tile mb-2"><span class="tile-icon"><i class="bi bi-{{ n.category.icon }}"></i></span>
+          <span><span class="fw-bold d-block">{{ n.name }}</span><small class="text-muted">≈ {{ n.km_away }} km away</small></span></a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
