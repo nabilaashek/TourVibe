@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Page not found{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="empty-state">
+    <i class="bi bi-signpost-split"></i>
+    <h1 class="h3 mt-3 text-dark fw-bold">Looks like you took a wrong turn</h1>
+    <p>This page does not exist.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">Back to home</a>
+  </div>
+</div>
+{% endblock %}

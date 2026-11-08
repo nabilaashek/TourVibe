@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:900px">
+  <div class="eyebrow">About</div>
+  <h1 class="section-title mb-3">TourVibe: Pack, Go &amp; Explore Bangladesh</h1>
+  <p class="lead text-muted">TourVibe is the new version of our Pack-Go project. It helps travelers find places in Bangladesh, choose the right season, estimate the cost of a trip and book tour packages.</p>
+  <div class="row g-4 my-3">
+    <div class="col-md-6"><div class="card-soft h-100"><h2 class="h6 fw-bold"><i class="bi bi-search text-success me-2"></i>Find places</h2><p class="small text-muted mb-0">Search by division, type, month and budget. Every place has its best months, daily cost, tips, photos and reviews.</p></div></div>
+    <div class="col-md-6"><div class="card-soft h-100"><h2 class="h6 fw-bold"><i class="bi bi-cart3 text-success me-2"></i>Cart and checkout</h2><p class="small text-muted mb-0">Add tour packages to the cart and book them in one order. Seats are checked so a tour is never overbooked.</p></div></div>
+    <div class="col-md-6"><div class="card-soft h-100"><h2 class="h6 fw-bold"><i class="bi bi-calculator text-success me-2"></i>Trip planner</h2><p class="small text-muted mb-0">Orders your places into a short route (nearest-neighbour method) and estimates transport, hotel, food, tickets and a 10% extra.</p></div></div>
+    <div class="col-md-6"><div class="card-soft h-100"><h2 class="h6 fw-bold"><i class="bi bi-lightbulb text-success me-2"></i>Where to go?</h2><p class="small text-muted mb-0">Scores places out of 100 using season, budget, interests and ratings, and shows the reasons.</p></div></div>
+  </div>
+  <h2 class="h5 fw-bold mt-4">Built with</h2>
+  <ul class="text-muted">
+    <li>Python and Django (MVT pattern), SQLite</li>
+    <li>Django REST Framework with token login - <a href="{% url 'api-home' %}">open the API</a></li>
+    <li>Bootstrap 5, Chart.js and JavaScript</li>
+    <li>ReportLab for PDF invoices</li>
+    <li>Automated tests: <code>python manage.py test</code></li>
+  </ul>
+</div>
+{% endblock %}

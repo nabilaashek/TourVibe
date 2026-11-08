@@ -1,0 +1,17 @@
+{% load travel_tags %}
+<div class="card h-100 dest-card">
+  <div class="card-body d-flex flex-column">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <span class="chip"><i class="bi bi-calendar-event"></i> {{ pk.start_date|date:"d M" }} · {{ pk.days }} days</span>
+      <span class="chip chip-accent">{{ pk.get_transport_display }}</span>
+    </div>
+    <h3 class="h5 fw-bold">{{ pk.title }}</h3>
+    <p class="small text-muted">{{ pk.summary }}</p>
+    <div class="small mb-3">{% for d in pk.destinations.all %}<span class="me-2"><i class="bi bi-geo-alt text-success"></i>{{ d.name }}</span>{% endfor %}</div>
+    <div class="mt-auto d-flex justify-content-between align-items-center">
+      <div><span class="fs-5 fw-bold">{{ pk.price_per_person|taka }}</span><small class="text-muted">/person</small></div>
+      <small class="{% if pk.seats_left < 5 %}text-danger fw-bold{% else %}text-muted{% endif %}">{{ pk.seats_left }} seats left</small>
+    </div>
+  </div>
+  <a href="{{ pk.get_absolute_url }}" class="stretched-link" aria-label="Open {{ pk.title }}"></a>
+</div>

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}My dashboard{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="eyebrow">Dashboard</div>
+  <h1 class="section-title mb-4">Hello, {{ user.profile.display_name }} 👋</h1>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="kpi"><div class="kpi-icon bg-brand-soft mb-2"><i class="bi bi-receipt"></i></div><div class="kpi-value">{{ order_count }}</div><div class="kpi-label">Active orders</div></div></div>
+    <div class="col-6 col-lg-3"><div class="kpi"><div class="kpi-icon bg-accent-soft mb-2"><i class="bi bi-wallet2"></i></div><div class="kpi-value">{{ spent|taka }}</div><div class="kpi-label">Confirmed trips value</div></div></div>
+    <div class="col-6 col-lg-3"><div class="kpi"><div class="kpi-icon bg-rose-soft mb-2"><i class="bi bi-heart"></i></div><div class="kpi-value">{{ wishlist_total }}</div><div class="kpi-label">Saved places</div></div></div>
+    <div class="col-6 col-lg-3"><div class="kpi"><div class="kpi-icon bg-sky-soft mb-2"><i class="bi bi-chat-square-text"></i></div><div class="kpi-value">{{ review_total }}</div><div class="kpi-label">Reviews written</div></div></div>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card-soft h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">Upcoming trips</h2><a href="{% url 'order_history' %}" class="small">All orders</a></div>
+        {% for item in upcoming %}
+        <a class="tile mb-2" href="{{ item.order.get_absolute_url }}">
+          <span class="tile-icon"><i class="bi bi-calendar-event"></i></span>
+          <span class="flex-fill"><span class="fw-bold d-block">{{ item.package.title }}</span><small class="text-muted">{{ item.package.start_date|date:"d M Y" }} · {{ item.travelers }} traveler{{ item.travelers|pluralize }} · {{ item.order.reference }}</small></span>
+          <span class="status status-{{ item.order.status }}">{{ item.order.get_status_display }}</span>
+        </a>
+        {% empty %}
+        <div class="empty-state py-4"><i class="bi bi-suitcase"></i><p class="mt-2">No upcoming trips.</p><a href="{% url 'package_list' %}" class="btn btn-primary btn-sm">Find a tour</a></div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card-soft mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">Wishlist</h2><a href="{% url 'wishlist' %}" class="small">View all</a></div>
+        {% for w in wishlist_items %}
+        <a class="tile mb-2 py-2" href="{{ w.tour.get_absolute_url }}"><span class="tile-icon"><i class="bi bi-heart-fill text-danger"></i></span><span class="fw-semibold">{{ w.tour.name }}</span></a>
+        {% empty %}<p class="text-muted small mb-0">Tap the heart on a place to save it here.</p>{% endfor %}
+      </div>
+      <div class="card-soft">
+        <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">Trip plans</h2><a href="{% url 'my_plans' %}" class="small">View all</a></div>
+        {% for plan in plans %}<div class="cost-row"><span>{{ plan.title }}</span><strong>{{ plan.estimated_total|taka }}</strong></div>
+        {% empty %}<p class="text-muted small mb-0">No saved plans. <a href="{% url 'planner' %}">Plan a trip</a></p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

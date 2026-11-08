@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static travel_tags %}
+{% block content %}
+<section class="hero hero-photo pt-5 pb-5 mb-5">
+  <div class="container py-lg-5 position-relative" style="z-index:1">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="chip chip-light mb-3"><i class="bi bi-backpack2"></i> Pack, Go &amp; Explore</span>
+        <h1 class="display-4 mb-3">Let's discover <span style="color:#fcd34d">Bangladesh</span> together</h1>
+        <p class="lead mb-4">Beaches, hills, forests and heritage in all eight divisions. See the best time to go, plan your budget and book a tour. <span class="bn">চলো ঘুরে আসি!</span></p>
+        <form class="hero-search row g-1" method="get" action="{% url 'tour_list' %}">
+          <div class="col-md-5"><input class="form-control form-control-lg" name="q" placeholder="Where do you want to go?" aria-label="Search"></div>
+          <div class="col-md-4">
+            <select class="form-select form-select-lg" name="division" aria-label="Division">
+              <option value="">Any division</option>
+              {% for d in divisions %}<option value="{{ d.slug }}">{{ d.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 d-grid"><button class="btn btn-accent btn-lg"><i class="bi bi-search"></i> Search</button></div>
+        </form>
+        <div class="d-flex gap-4 mt-4 hero-stat">
+          <div><strong>{{ counts.places }}</strong><span>Places</span></div>
+          <div><strong>{{ counts.divisions }}</strong><span>Divisions</span></div>
+          <div><strong>{{ counts.reviews }}</strong><span>Reviews</span></div>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="card-soft text-dark">
+          <div class="eyebrow mb-2">This month</div>
+          <h2 class="h5 fw-bold mb-3">Best places to visit now</h2>
+          <div class="d-flex flex-column gap-2">
+            {% for p in in_season %}
+            <a class="tile py-2" href="{{ p.get_absolute_url }}">
+              <span class="tile-icon"><i class="bi bi-geo-alt"></i></span>
+              <span><span class="fw-bold d-block">{{ p.name }}</span><small class="text-muted">{{ p.district }}, {{ p.division.name }}</small></span>
+            </a>
+            {% empty %}<p class="text-muted mb-0">No places yet.</p>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div><div class="eyebrow">Destination</div><h2 class="section-title mb-0">Explore top destinations</h2></div>
+      <a href="{% url 'tour_list' %}" class="btn btn-outline-primary">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for p in featured %}<div class="col-sm-6 col-lg-4">{% include 'partials/place_card.html' %}</div>{% endfor %}
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <div class="eyebrow">Browse</div>
+    <h2 class="section-title mb-3">What kind of trip?</h2>
+    <div class="row g-3">
+      {% for c in categories %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <a class="tile" href="{% url 'tour_list' %}?category={{ c.slug }}">
+          <span class="tile-icon"><i class="bi bi-{{ c.icon }}"></i></span>
+          <span><span class="fw-bold d-block">{{ c.name }}</span><small class="text-muted">{{ c.total }} place{{ c.total|pluralize }}</small></span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <div class="eyebrow">By region</div>
+    <h2 class="section-title mb-3">Eight divisions to explore</h2>
+    <div class="row g-3">
+      {% for d in divisions %}
+      <div class="col-6 col-md-3">
+        <a class="tile" href="{% url 'tour_list' %}?division={{ d.slug }}">
+          <span class="tile-icon"><i class="bi bi-map"></i></span>
+          <span><span class="fw-bold d-block">{{ d.name }} <span class="bn text-muted fw-normal small">{{ d.bangla_name }}</span></span><small class="text-muted">{{ d.total }} place{{ d.total|pluralize }}</small></span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if packages %}
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div><div class="eyebrow">Ready-made trips</div><h2 class="section-title mb-0">Upcoming tour packages</h2></div>
+      <a href="{% url 'package_list' %}" class="btn btn-outline-primary">All packages <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for pk in packages %}<div class="col-md-4">{% include 'partials/package_card.html' %}</div>{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="card-soft d-md-flex align-items-center justify-content-between gap-4">
+    <div>
+      <div class="eyebrow">Smart planning</div>
+      <h2 class="h4 fw-bold mb-1">How much will my trip cost?</h2>
+      <p class="text-muted mb-md-0">Pick the places. The planner finds a short route and adds up transport, hotel, food and tickets.</p>
+    </div>
+    <div class="d-flex gap-2 flex-shrink-0">
+      <a href="{% url 'where_to_go' %}" class="btn btn-outline-primary">Get suggestions</a>
+      <a href="{% url 'planner' %}" class="btn btn-primary">Plan a trip</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

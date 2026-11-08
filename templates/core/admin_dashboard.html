@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load travel_tags %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-md-flex justify-content-between align-items-end mb-4 gap-3">
+    <div><div class="eyebrow">Admin</div><h1 class="section-title mb-0">Business overview</h1></div>
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+      <a class="btn btn-outline-primary" href="{% url 'create_tour' %}"><i class="bi bi-plus-circle"></i> Add destination</a>
+      <a class="btn btn-primary" href="{% url 'manage_orders' %}"><i class="bi bi-journal-check"></i> Orders{% if stats.pending %} <span class="badge text-bg-warning">{{ stats.pending }}</span>{% endif %}</a>
+    </div>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-2"><div class="kpi"><div class="kpi-icon bg-brand-soft mb-2"><i class="bi bi-cash-coin"></i></div><div class="kpi-value fs-5">{{ stats.revenue|taka }}</div><div class="kpi-label">Confirmed revenue</div></div></div>
+    <div class="col-6 col-lg-2"><div class="kpi"><div class="kpi-icon bg-sky-soft mb-2"><i class="bi bi-receipt"></i></div><div class="kpi-value">{{ stats.orders }}</div><div class="kpi-label">Active orders</div></div></div>
+    <div class="col-6 col-lg-2"><div class="kpi"><div class="kpi-icon bg-accent-soft mb-2"><i class="bi bi-hourglass-split"></i></div><div class="kpi-value">{{ stats.pending }}</div><div class="kpi-label">Waiting to confirm</div></div></div>
+    <div class="col-6 col-lg-2"><div class="kpi"><div class="kpi-icon bg-rose-soft mb-2"><i class="bi bi-people"></i></div><div class="kpi-value">{{ stats.travelers }}</div><div class="kpi-label">Travelers</div></div></div>
+    <div class="col-6 col-lg-2"><div class="kpi"><div class="kpi-icon bg-brand-soft mb-2"><i class="bi bi-geo-alt"></i></div><div class="kpi-value">{{ stats.places }}</div><div class="kpi-label">Places</div></div></div>
+    <div class="col-6 col-lg-2"><div class="kpi"><div class="kpi-icon bg-sky-soft mb-2"><i class="bi bi-calendar-check"></i></div><div class="kpi-value">{{ stats.tours }}</div><div class="kpi-label">Upcoming tours</div></div></div>
+  </div>
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8"><div class="card-soft h-100"><h2 class="h6 fw-bold">Confirmed revenue by month</h2><div style="height:260px"><canvas id="revenueChart"></canvas></div></div></div>
+    <div class="col-lg-4"><div class="card-soft h-100"><h2 class="h6 fw-bold">Orders by status</h2><div style="height:260px"><canvas id="statusChart"></canvas></div></div></div>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card-soft p-0 overflow-hidden h-100">
+        <div class="p-3 d-flex justify-content-between"><h2 class="h6 fw-bold mb-0">Recent orders</h2><a href="{% url 'manage_orders' %}" class="small">View all</a></div>
+        <div class="table-responsive"><table class="table align-middle mb-0">
+          <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>{% for o in recent %}
+            <tr><td><a href="{{ o.get_absolute_url }}">{{ o.reference }}</a><div class="small text-muted">{{ o.created_at|date:"d M Y" }}</div></td><td>{{ o.contact_name }}</td><td>{{ o.total_price|taka }}</td><td><span class="status status-{{ o.status }}">{{ o.get_status_display }}</span></td></tr>
+          {% empty %}<tr><td colspan="4" class="text-muted text-center py-4">No orders yet.</td></tr>{% endfor %}</tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card-soft mb-4"><h2 class="h6 fw-bold">Places per division</h2><div style="height:220px"><canvas id="divisionChart"></canvas></div></div>
+      <div class="card-soft">
+        <h2 class="h6 fw-bold mb-3">Best selling tours</h2>
+        {% for p in popular %}<div class="cost-row"><a href="{{ p.get_absolute_url }}">{{ p.title }}</a><strong>{{ p.sold }} seats</strong></div>
+        {% empty %}<p class="text-muted small mb-0">No confirmed orders yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{{ chart|json_script:"chart-data" }}
+{% endblock %}
+{% block chartjs %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>{% endblock %}
+{% block scripts %}<script>
+  const c = readJson('chart-data', {});
+  drawChart('revenueChart', 'line', c.revenue_labels, c.revenue_values, {label: 'Revenue (BDT)'});
+  drawChart('statusChart', 'doughnut', c.status_labels, c.status_values);
+  drawChart('divisionChart', 'bar', c.division_labels, c.division_values, {label: 'Places'});
+</script>{% endblock %}
