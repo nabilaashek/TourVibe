@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<div class="container auth-wrap py-5">
+  <div class="card-soft auth-card" style="max-width:620px">
+    <div class="text-center mb-4">
+      <h1 class="h4 fw-bold mb-1">Create your account</h1>
+      <p class="text-muted small mb-0">Save places, book tours and keep your trip plans.</p>
+    </div>
+    <form method="post" novalidate>{% csrf_token %}
+      {% include 'partials/form_errors.html' %}
+      <div class="row">
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.full_name %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.username %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.email %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.phone_number %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.password1 %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.password2 %}</div>
+      </div>
+      <div class="d-grid"><button class="btn btn-primary btn-lg">Create account</button></div>
+    </form>
+    <p class="text-center small mt-3 mb-0">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

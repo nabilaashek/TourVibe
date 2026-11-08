@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="container auth-wrap py-5">
+  <div class="card-soft auth-card">
+    <div class="text-center mb-4">
+      <span class="brand-mark mb-2" style="width:52px;height:52px;font-size:1.5rem"><i class="bi bi-backpack2"></i></span>
+      <h1 class="h4 fw-bold mb-1">Welcome back</h1>
+      <p class="text-muted small mb-0">Log in to book tours, save places and plan trips.</p>
+    </div>
+    <form method="post" novalidate>{% csrf_token %}
+      {% include 'partials/form_errors.html' %}
+      {% include 'partials/field.html' with field=form.username %}
+      {% include 'partials/field.html' with field=form.password %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="d-grid"><button class="btn btn-primary btn-lg">Log in</button></div>
+    </form>
+    <p class="text-center small mt-3 mb-0">New here? <a href="{% url 'signup' %}">Create an account</a></p>
+  </div>
+</div>
+{% endblock %}
